@@ -1,0 +1,112 @@
+
+--------11.1------------
+Exercise 11.1 In this exercise you will try running an EchoServer
+and EchoClient on your own PC.
+
+1. Compile and run the code for the tutorial EchoServer and EchoClient.
+You need to open two command
+line windows (shells): one for running the server
+and one for running the client!!!!
+2. Modify the code for the EchoClient and EchoServer so any
+word sent by the client is capitalized by
+the server and then returned. Test your revised code on
+a few examples to demonstrate that the changed
+code work as expected.
+
+in the server code:
+                String response = inputLine.toUpperCase();
+                out.println(response);
+result:
+hello world ! -> HELLO WORLD !
+
+
+--------11.2------------
+Exercise 11.2 In this exercise you must perform, on your own hardware,
+the measurement performed in the
+lecture using the example code in the files NumberServer.java
+and SocketCountingThreads.java.
+
+1. In the run method of SocketCountingThreads.java
+there are three lines, two of them are inactive
+(because they are commented out). The first experiment is
+running the "noLocking" version.
+Compile and run the code files NumberServer and SocketCountingThreads.
+As in the first exercise
+above you need two command line windows.
+In this version there can be race conditions in the server
+because the two commands get and put are not executed as one atomic operation.
+Before closing the NumberServer prints the value of its counter.
+Record this number and inspects the code
+in SocketCountingThreads.
+
+What would be the result if there where no race conditions:
+100, as we have 10 threads doing 10 increments each.
+
+2. Record the execution time:
+
+    noLocking() :
+//No locks.
+//uses GET on the server and gets a value
+//Then increments in client
+//Then uses PUT on the server
+//all done non-atomically
+Socket com:                          78.6 mS 18367392.11          4
+count= 27
+    serverLocking() :
+//Uses INCR, that on server increments and returns the new value
+Socket com:                          14.6 mS 5573287.89         16
+count= 100
+    clientLocking() :
+//Client locks.
+//uses GET on the server, which returns the value
+//Increment the value on client
+//Then uses PUT on the server
+//Client unlocks
+Socket com:                           7.3 mS  347206.99         64
+count= 100
+
+Are they as expected? Why/why not?:
+
+The server is sequential. It can only handle one request at a time.
+If the server is busy with one request, the other requests are queued.
+The server is a bottleneck.
+
+* NoLocking, two threads might get the same value from the server,
+increment them individually and both threads put the same value back.
+Thus an increment is lost.
+* The serverLocking() is slower than the noLocking()
+because of the overhead of the synchronized block.
+* The clientLocking() is faster than the serverLocking()
+because the synchronized block is only executed on the client side.
+So now there is no contention on the server side.
+
+3. If you have two PC’s set up an experiment
+where the server is running on one PC and
+SocketCountingThreads on the other.
+Change the value of the string URL (top of the source code) to
+the IP address of the server PC.
+Repeat the timing experiments for serverLocking(),
+clientLocking() and compare the results
+with the measurements where the client and server ran on the same PC.
+
+It is magnitudes slower, as the network is the bottleneck.
+
+--------11.3------------
+1. Try to run the code in BusDepart.java.
+2. Find the code for a train station/bus
+stop near your home (see slides lecture11.pdf). Replace the code for
+ITU in BusDepart.java with the code of your bus stop.
+Compile and run your "personalized" rejseplan.
+
+Our bus at Høje Tåstrup:
+"https://xmlopen.rejseplanen.dk/bin/rest.exe/departureBoard?offsetTime=0&format=json&id=hoejetaastrup";
+
+Bus 400S: 08:05 mod Hundige St.
+Bus 123: 08:14 mod Glostrup St. (Banegårdspladsen)
+Bus 119: 08:15 mod Høje Taastrup St.
+Bus 400S: 08:15 mod Ishøj St.
+
+--------11.4------------
+See week11Erlang folder
+
+

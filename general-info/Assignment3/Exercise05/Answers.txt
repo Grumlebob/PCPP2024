@@ -1,0 +1,202 @@
+----------------------------------------------------------
+Exercise 5.1 A histogram is a collection of bins, each of which is an integer count. The span of the histogram
+is the number of bins. In the problems below a span of 30 will be sufficient; in that case the bins are numbered
+0 . . . 29.
+Consider this Histogram interface for creating histograms:
+interface Histogram {
+void increment(int bin);
+int getCount(int bin);
+int getSpan();
+int getAndClear(int bin);
+}
+Intuitively, these methods work as follows: increment(7) will add one to bin 7; method call getCount(7)
+will return the current count in bin 7; method getSpan() will return the number of bins; and, finally, the
+method getAndClear(7) returns the current count in bin 7 and reset the count to 0. The class Histogram1
+in app/src/main/java/exercises05/Histogram1.java contains a non-thread-safe implementation
+with this behavior.
+In this exercise, your task is to implement and test a lock-free Histogram class, CasHistogram, that has
+the behavior explained above also for concurrent execution of method calls. The implementation must use
+AtomicInteger, and only use the methods compareAndSet and get; no other methods provided in the
+class AtomicInteger can be used in your implementation.
+Mandatory
+1. Write a class CasHistogram implementing the above interface.
+In your implementation, ensure that: i)
+class state does not escape, and ii) safe-publication.
+Explain why i) and ii) are guaranteed in your implementation,
+and report any immutable variables.
+
+See CasHistogram.java for
+
+Why i): class state does not escape:
+The Bins, is set as private, and only way to access it, is
+through the methods encaplated in the class,
+and no method returns the Bins object.
+So there is no way to access the state (Bins) from outside the class.
+
+
+Why ii): Safe-publication:
+Our Bins (AtomicReference) is final.
+
+
+2. Note that the behavior for the method getAndClear(int bin) combines two operations:
+get (obtaining the current count in the specified bin, and clear reset the bin count to 0.
+Does your implementation for
+this method behave as if the operations were executed atomically? Explain your answer.
+
+CORRECT:
+Yes!
+
+WRONG:
+No, in a sense. If you make a call to getAndClear it will get a value,
+but before it can clear another thread can change the value.
+When this happens the call to getAndClear will loop and get the new value.
+This can happen any number of times. The returned value will be the latest value
+before the clear. But it may also in an extreme worst case be starved and never return.
+
+
+
+
+3. Your task in this exercise is to write a parallel functional
+correctness test for CasHistogram. In this
+test, you must use your CasHistogram class to concurrently
+count the number of prime factors for the
+numbers in the range (0, 4999).
+In this parallel test, you must create one thread per number to
+check, and all threads must share the CasHistogram object
+under test. You must use JUnit 5 and the
+techniques we covered in week 4. To assert correctness,
+perform the same computation sequentially using
+the class Histogram1. Your test must check that each bin of
+the resulting CasHistogram (executed in
+parallel) equals the result of the same bin in Histogram1
+(executed sequentially).
+
+See TestHistogram.java for the tests
+
+
+
+----------------------------------------------------------
+Exercise 5.2 Recall read-write locks, in the style of
+Java’s java.util.concurrent.locks.ReentrantReadWriteLock.
+As we discussed, this type of lock can be held either
+by any number of readers, or by a single writer.
+In this exercise you must implement a simple read-write lock
+class SimpleRWTryLock that is not reentrant and
+that does not block. It should implement the following interface:
+interface SimpleRWTryLockInterface {
+public boolean readerTryLock();
+public void readerUnlock();
+public boolean writerTryLock();
+public void writerUnlock();
+}
+
+
+1. Implement the writerTryLock method.
+It must check that the lock is currently unheld and then atomically
+set holders to an appropriate Writer object.
+(Method writerTryLock is called by a thread that tries to obtain a write lock.
+It must succeed and return true if
+ the lock is not already held by any thread, and return false if the lock
+ is held by at least one reader or by a writer.)
+
+
+We use CompareAndSet
+Expected value is null (because that means no one is holding the lock, and
+the specification says only a single writer may hold it)
+New value: is a new Writer object, which is the current thread.
+If this doesn't succeed, compareAndSet will return false.
+If it does succeed, it will return true.
+
+
+2. Implement the writerUnlock method. It must check that the
+lock is currently held and that the holder is
+the calling thread, and then release the lock by setting holders to null;
+or else throw an exception.
+
+In short:
+We ensure we are the current writer holding the lock.
+If we are the current writer with the lock, we release it
+by setting holders atomicreference to null.
+In case we are not the current writer with the lock,
+we throw an exception.
+
+3. Implement the readerTryLock method.
+This is marginally more complicated because multiple other
+threads may be (successfully) trying to lock at the same time,
+or may be unlocking read locks at the same
+time. Hence you need to repeatedly read the holders field, and,
+as long as it is either null or a ReaderList,
+attempt to update the field with an extended reader list,
+containing also the current thread.
+(Although the SimpleRWTryLock is not intended to be reentrant,
+for the purposes of this exercise you
+need not prevent a thread from taking the same lock more than once).
+
+In short:
+If a writer has the lock, we return false.
+If a reader has the lock, we keep attempting to add
+the current thread to the readerlists, and when that is done,
+we return true.
+
+
+4. Implement the readerUnlock method. You should repeatedly
+read the holders field and, as long as
+i) it is non-null and
+ii) refers to a ReaderList and
+iii) the calling thread is on the reader list, create a new
+reader list where the thread has been removed,
+and try to atomically store that in the holders field; if this
+succeeds, it should return. If holders is null or does not
+refer to a ReaderList or the current thread is
+not on the reader list, then it must throw an exception.
+For the readerUnlock method it is useful to implement a
+couple of auxiliary methods on the immutable
+ReaderList:
+public boolean contains(Thread t) { ... }
+public ReaderList remove(Thread t) { ... }
+
+
+5. Write simple sequential JUnit 5 correctness tests
+that demonstrates that your read-write lock works with a
+single thread. Your test should check, at least, that:
+• It is not possible to take a read lock while holding a write lock.
+• It is not possible to take a write lock while holding a read lock.
+• It is not possible to unlock a lock that
+you do not hold (both for read and write unlock).
+You may write other tests to increase your confidence
+that your lock implementation is correct.
+
+See TestLocks.java for solution and comments
+
+6. Finally, write a parallel functional correctness test
+that checks that two writers cannot acquire the lock at
+the same time. You must use JUnit 5 and the techniques we
+covered in week 4. Note that for this exercise
+readers are irrelevant. Intuitively, the test should create
+two or more writer threads that acquire and release
+the lock. You should instrument the test to check whether
+there were 2 or more threads holding the lock at
+the same time. This check must be performed when all threads
+finished their execution. This test should be
+performed with enough threads so that race conditions may
+occur (if the lock has bugs).
+
+See TestLocks.java for solution and comments
+
+
+7. (Challenging) Improve the readerTryLock method so that it
+prevents a thread from taking the same lock more than
+once, instead an exception if it tries. For instance, the calling
+thread may use the contains method to
+check whether it is not on the readers list, and add itself to
+the list only if it is not. Explain why such a
+solution would work in this particular case, even if the test-then-set
+sequence is not atomic.
+
+The readerlist can only contain the thread itself if the thread holds the lock.
+And only the thread itself can remove itself from the list.
+Therefore if the list contains the thread while it calls readerTryLock,
+it must fail because it already holds the lock.
+
+
+

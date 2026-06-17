@@ -1,0 +1,16 @@
+# Start Erlang shell
+erl
+
+#to compile alle
+erl -make
+
+# In the Erlang shell, compile both files
+1> c(functional_erlang).
+2> c(functional_erlang_tests).
+
+# Run the tests
+3> functional_erlang_tests:run_all_tests().
+
+
+# to exit:
+q().

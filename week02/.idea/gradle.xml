@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/code-exercises/week02exercises" />
+        <option name="gradleJvm" value="corretto-16" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/code-exercises/week02exercises" />
+            <option value="$PROJECT_DIR$/code-exercises/week02exercises/app" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/code-lecture/week02lecture" />
+        <option name="gradleJvm" value="corretto-16" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/code-lecture/week02lecture" />
+            <option value="$PROJECT_DIR$/code-lecture/week02lecture/app" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

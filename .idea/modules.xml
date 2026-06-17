@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/PCPP2024.iml" filepath="$PROJECT_DIR$/.idea/PCPP2024.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises01.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises01.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises01.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises01.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises01.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises01.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises01.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises01.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises02.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises02.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises02.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises02.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises02.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises02.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises02.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises02.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises03.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises03.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises03.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises03.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises03.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises03.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises03.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises03.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises04.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises04.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises04.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises04.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises04.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises04.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises04.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises04.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises05.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises05.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises05.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises05.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises05.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises05.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises05.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises05.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises06.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises06.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises06.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises06.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises06.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises06.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises06.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises06.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises08.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises08.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises08.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises08.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises08.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises08.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises08.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises08.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises09.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises09.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises09.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises09.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises09.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises09.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises09.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises09.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises10.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises10.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises10.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises10.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises10.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises10.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises10.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises10.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/exercises11.iml" filepath="$PROJECT_DIR$/.idea/modules/exercises11.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises11.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises11.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises11.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises11.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/exercises11.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/exercises11.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lecture01.iml" filepath="$PROJECT_DIR$/.idea/modules/lecture01.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/lecture01.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/lecture01.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/lecture01.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/lecture01.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/lecture01.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/lecture01.app.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lecture07.iml" filepath="$PROJECT_DIR$/.idea/modules/lecture07.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/lecture07.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/lecture07.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/lecture07.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/lecture07.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/lecture07.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/lecture07.app.test.iml" />
+    </modules>
+  </component>
+</project>

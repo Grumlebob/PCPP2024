@@ -1,0 +1,232 @@
+---------8.0 System Info---------
+SAME COMPUTER USED FOR EVERY EXERCISE
+
+# Date: 2024-10-21
+OS:   Windows 10; 10.0; amd64
+JVM:  Amazon.com Inc.; 16.0.2
+CPU:  Intel64 Family 6 Model 140 Stepping 1, GenuineIntel; 8 "cores"
+Processor	11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz, 2419 Mhz, 4 Core(s), 8 Logical Processor(s)
+System Model	HP Laptop 15-dw3xxx
+System Type	x64-based PC
+BIOS Version/Date	Insyde F.66, 10/05/2024
+BaseBoard Manufacturer	HP
+BaseBoard Product	881D
+BaseBoard Version	50.34
+Model	NVMe WDC PC SN530 SDBPNPZ-512G-1006
+------------------
+Exercise 8.1 In this exercise you must perform, on your own hardware,
+the measurement performed in the
+lecture using the example code in file TestTimeThreads.java.
+
+1. First compile and run the thread timing code as is, using Mark6,
+to get a feeling for the variation and
+robustness of the results. Do not hand in the results but discuss any
+strangenesses, such as large variation in
+the time measurements for each case.
+
+Large variations, might be due to:
+- Inital warmup to trigger all initializations and compilations
+- Gargabe collection,
+- Other processes running in the background,
+- Not turning off power saving scheme on our laptop
+
+2. Now change all the measurements to use Mark7, which reports only
+the final result. Record the results in
+a text file along with appropriate system identification.
+Include the results in your hand-in, and reflect and comment on them:
+Are they plausible? Any surprises?
+Mention any cases where they deviate significantly from those shown in the lecture.
+Mark7 measurements:
+Point creation                       38.2 ns       0.45    8388608
+Thread's work                      5357.0 ns     107.61      65536
+Thread create                       743.7 ns      66.83     524288
+Thread create start              105807.2 ns    8811.07       4096
+Thread create start join         146235.9 ns    8931.10       2048
+Uncontended lock                     19.4 ns       0.44   16777216
+
+The results are very plausible. As seen during the lecture,
+creating a thread is about 20 times more expensive than creating just an POCO object.
+This can be seen, above where point creation is 38ns and thread creation is 743ns (about 20 times).
+Starting the thread is expensive, about 105000n.
+Therefore we should never make threads, that only do a very small computation.
+As the overhead from creating a thread, would be more expensive than the computation itself.
+
+
+3. Use the same reasoning as in the lecture (slide "Thread create + start")
+to estimate the cost of creating a
+thread on your own computer. Include your result in the text files with answers
+for this exercise.
+
+Create: 740 - 40 = 700 ns (subtracting cost of hashcode + pointer)
+Starting the thread: 105000 - 700 = 104300 ns (subtracting the cost of creating the thread)
+Joining the thread: 146000 - 105000 - 5000 - 740 = 35.260 ns (subtracting all the above + threads work)
+
+
+
+
+
+-------------------
+Exercise 8.2 In this exercise you should estimate whether there is a
+performance gain by declaring a shared
+variable as volatile. Consider this simple class that has both a volatile
+int and another int that is not declared
+volatile:
+public class TestVolatile {
+private volatile int vCtr;
+private int ctr;
+public void vInc () { vCtr++; }
+public void inc () { ctr++; }
+}
+
+Use Mark7 (from Bendchmark.java) to compare the performance of
+incrementing a volatile int and a
+normal int. Include the results in your hand-in and comment on them:
+Are they plausible? Any surprises?
+
+Volatile Increment                 5433.9 ns     149.07      65536
+Non-Volatile Increment               49.3 ns       0.92    8388608
+
+Since the non-volatile integer can be cached unlike the volatile it is not surprising
+that the volatile is much slower, since it must be read from- and written to main memory
+for every increment.
+
+-----------------------------------
+Exercise 8.3 In this exercise you must use the benchmarking
+infrastructure to measure the performance of the
+prime counting example given in file TestCountPrimesThreads.java.
+
+1. Measure the performance of the prime counting example on your own
+hardware, as a function of the number
+of threads used to determine whether a given number is a prime.
+Record system information as well as the
+measurement results for 1. . . 32 threads in a text file. If the
+measurements take excessively long time on
+your computer, you may measure just for 1. . . 16 threads instead.
+
+countSequential                 4301564.4 ns   90646.45         64
+countParallelN       1          4784717.0 ns   30830.66         64
+countParallelNLocal  1          4984122.0 ns  145944.92         64
+countParallelN       2          3531625.9 ns  112854.68        128
+countParallelNLocal  2          3421772.3 ns   89634.54        128
+countParallelN       3          3100943.2 ns  265003.51        128
+countParallelNLocal  3          3128191.6 ns   96056.44        128
+countParallelN       4          3027916.0 ns   69290.18        128
+countParallelNLocal  4          2793923.4 ns  113452.97        128
+countParallelN       5          3105189.1 ns   67184.94        128
+countParallelNLocal  5          2851506.2 ns   73880.55        128
+countParallelN       6          3359047.5 ns   63452.28        128
+countParallelNLocal  6          2597664.7 ns   58100.93        128
+countParallelN       7          3592836.6 ns  149195.80        128
+countParallelNLocal  7          2508688.1 ns   66035.35        128
+countParallelN       8          3667971.3 ns  121392.26        128
+countParallelNLocal  8          2540051.6 ns   78628.31        128
+countParallelN       9          5751236.8 ns 2268811.01        128
+countParallelNLocal  9          2865533.1 ns  199870.71        128
+countParallelN      10          3865379.8 ns  251464.17        128
+countParallelNLocal 10          2865649.1 ns  194866.18        128
+countParallelN      11          4074204.7 ns  308900.54         64
+countParallelNLocal 11          3176631.0 ns  402740.01        128
+countParallelN      12          3801713.8 ns  180507.04        128
+countParallelNLocal 12          3427364.1 ns  455728.41        128
+countParallelN      13          4204533.0 ns  237098.62         64
+countParallelNLocal 13          3695547.3 ns  422275.25        128
+countParallelN      14          4628544.5 ns  476291.56         64
+countParallelNLocal 14          2816544.0 ns  186760.43        128
+countParallelN      15          3783609.8 ns  333439.95         64
+countParallelNLocal 15          2623270.7 ns   63458.98        128
+countParallelN      16          3759757.2 ns  237897.91         64
+countParallelNLocal 16          2606579.3 ns  151765.87        128
+
+
+2. Reflect and comment on the results; are they plausible? Is there any
+reasonable relation between the number
+of threads that gave best performance, and the number of cores in the
+computer you ran the benchmarks on? Any surprises?
+
+With one thread there is an overhead for creating, starting and joining making it slower
+than the sequential version. As more threads are used the performance increases,
+but after 4 it gets slightly slower again since the computer running the program
+only has 4 cores meaning more threads only give more overhead because the scheduler needs
+to manage more threads than there are cores.
+
+3. Now change the worker thread code in the lambda expression to
+work like a very performance-conscious
+developer might have written it. Instead of calling lc.increment()
+on a shared thread-safe variable lc
+from all the threads, create a local variable int count= 0 inside
+the lambda (defining the computation
+of the thread), and increment that variable in the for-loop. This local
+variable is thread-confined and needs
+no synchronization. After the for-loop, add the local variable’s value
+to a shared AtomicLong, and at the
+end of the countParallelN method return the value of the AtomicLong.
+This reduces the number of synchronizations from several hundred
+thousands to at most threadCount,
+which is at most 32. In theory this might make the code faster.
+Measure whether this is the case on your hardware.
+
+See 8.3.1 for the results.
+
+Every call to lc.increment() is a synchronized call, which is expensive,
+and threads may have to wait for each other.
+Therefore fewer of those calls with more local calls instead makes the program faster
+as we can see when comparing the two versions.
+
+-------------------
+Exercise 8.4 In this exercise you must write code searching for
+a string in a (large) text. Such a search is
+the core of any web-crawling service such as Google, Bing,
+Duck-Go-Go etc.In the guest lecture (Week 7) you
+heard about a Danish company providing a very specialized
+web-crawling solution that provides search results in real-time.
+
+1. TestTimeSearch uses a slightly extended version of the LongCounter
+where two methods have been
+added void add(long c) that increments the counter by c and void reset()
+that sets the counter to 0.
+Extend LongCounter with these two methods in such a way that the
+counter can still be shared safely by several threads.
+
+Both methods synchronized:
+Add: count+= c;
+Reset: count= 0;
+
+2. How many occurencies of "ipsum" is there in long-text-file.txt.
+Record the number in your solution.
+
+1430
+
+3. Use Mark7 to benchmark the search function.
+Record the result in your solution.
+
+Sequential Search               6261797.7 ns  537753.49         64
+
+4. Extend the code in TestTimeSearch with a new method
+private static long countParallelN(String target,
+String[] lineArray, int N, LongCounter lc) {
+// uses N threads to search lineArray
+...
+}
+Fill in the body of countParallelN in such a way that
+the method uses N threads to search the lineArray.
+Provide a few test results that make i plausible that your code works correctly.
+
+Done.
+
+5. Use Mark7 to benchmark countParallelN. Record the result in your
+solution and provide a small
+discussion of the timing results.
+
+Parallel Search with 1 threads       6857246.4 ns  309405.32         64
+Parallel Search with 2 threads       4017442.8 ns   78096.65         64
+Parallel Search with 4 threads       3825085.6 ns  683046.80         64
+Parallel Search with 8 threads       4000976.4 ns  484909.04        128
+Parallel Search with 16 threads       4129147.8 ns  188861.18         64
+
+For small datasets, the overhead of creating and managing threads
+may not provide a significant performance benefit,
+but for large datasets, parallelization can lead to substantial improvements.
+The number of threads should be tuned based on the hardware
+capabilities (e.g., number of CPU cores)
+to achieve the best performance.
+This is why we get the best results for 4 threads, as this computer has 4 cores.

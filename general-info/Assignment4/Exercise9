@@ -1,0 +1,270 @@
+--------------9.1----------------
+Exercise 9.1 This exercise is based on the program AccountExperiments.java
+(in the exercises directory
+for week 9). It generates a number of transactions to move money between accounts.
+Each transaction
+simulate transaction time by sleeping 50 milliseconds. The transactions
+are randomly generated, but ensures that
+the source and target accounts are not the same.
+
+1. Use Mark7 (from Benchmark.java in the benchmarking package) to measure
+the execution time and verify
+that the time it takes to run the program is proportional to the
+number of transactions: NO_TRANSACTION.
+
+AccountTransaction - NO_TRANSACTION:5            311305780.0 ns 1105813.77          2
+AccountTransaction - NO_TRANSACTION:10           620735640.0 ns 1633843.64          2
+So it doubles in time, and therefore the runtime is
+proportional to the number of transactions.
+
+
+2. Now consider the version in ThreadsAccountExperimentsMany.java
+(in the directory exercises09).
+Consider these four lines of the transfer:
+Account min = accounts[Math.min(source.id, target.id)];
+Account max = accounts[Math.max(source.id, target.id)];
+synchronized(min) {
+    synchronized(max) {
+        // transaction logic
+    }
+}
+
+Account s = accounts[source.id];
+Account t = accounts[target.id];
+synchronized(s) {
+    synchronized(t) {
+        // transaction logic
+    }
+}
+Explain why the calculation of min and max are necessary?
+Run the program with both versions of the code
+shown above and explain the results of doing this.
+
+Lets assume we have the second version and encounters this:
+T1: 5 -> 7 (100kr)
+T2: 7 -> 5 (100kr)
+
+Here T1 will lock 5, and T2 will lock 7.
+But now T1 waits forever trying to lock 7, and T2 waits forever trying to lock 5.
+This is a deadlock!
+
+If it is:
+T1: 5 -> 7 (100kr)
+T2: 5 <- 7 (100kr)
+T1 will lock 5.
+T2 will try to lock 5, and wait.
+T1 will lock 7. Make the transaction and release both locks.
+T2 will lock 5 and then 7, and make the transaction.
+Therefore we have no deadlock!
+So by always locking the account with the smaller ID (min)
+first and the larger ID (max) second, the code guarantees that all
+threads acquire locks in a consistent order. This avoids Deadlock:
+
+
+3. Change the program in ThreadsAccountExperimentsMany.java
+to use a the executor framework
+instead of raw threads. Make it use a ForkJoin thread pool.
+For now do not worry about terminating the
+main thread, but insert a print statement in the
+doTransaction method, so you can see that all executors are active.
+
+Done.
+
+4. Ensure that the executor shuts down after all tasks has been executed.
+
+Done. Explained:
+Prevents executor from accepting new tasks:
+pool.shutdown();
+Block the current thread until either all tasks have completed execution,
+the specified timeout occurs, or the thread is interrupted:
+pool.awaitTermination(1, TimeUnit.MINUTES);
+
+
+(Challenging)5. Use Mark8Setup to measure the execution time of
+the solution that ensures termination.
+
+Haven't done it.
+
+---------------------9.2------------------------:
+Exercise 9.2 In the lecture it was shown how to estimate
+the maximal speed-up for Quicksort using up-to 8
+threads (processors/cores) and that this estimate was consistent with Amdahls law.
+
+
+1. Use the same method to estimate the maximum speed-up
+for Quicksort on hardware with 16 and 32 cores.
+
+Amdahl's Law states that the maximum speed-up
+S of a computation is limited by the fraction of the task that is sequential.
+The formula is:
+Speed-up <= 1/(F+(1-F)/N)
+Where:
+F = Fraction of the task that is sequential (not parallelizable)
+N = Number of processors (cores)
+
+Quicksort:
+We assume a parallel fraction of 80% (or F=0.2),
+based on Quicksort's typical behavior.
+For 16 cores:
+S ≈ 1 / (0.2 + (0.8 / 16))
+S ≈ 1 / (0.2 + 0.05)
+S ≈ 1 / 0.25 = 4
+Thus a speed-up of 4 is expected for 16 cores.
+
+For 32 cores:
+S ≈ 1 / (0.2 + (0.8 / 32))
+S ≈ 1 / (0.2 + 0.025)
+S ≈ 1 / 0.225 ≈ 4.44
+Thus a speed-up of 4.44 is expected for 32 cores.
+
+2. Estimate the maximum speed-up for sorting
+1.000.000 and 10.000.000 numbers with Quicksort on hardware
+with 16 and 32 cores.
+
+From the slides, we know that scalability improves with larger data.
+We adjust F downwards slightly for larger arrays.
+
+Sorting 1,000,000 elements, assuming F=0.15.
+16 cores:
+S ≈ 1 / (0.15 + (0.85 / 16))
+S ≈ 1 / (0.15 + 0.053125) ≈ 5.13
+Thus a speed-up of 5.13 is expected for 16 cores.
+
+32 cores:
+S ≈ 1 / (0.15 + (0.85 / 32))
+S ≈ 1 / (0.15 + 0.0265625) ≈ 5.88
+Thus a speed-up of 5.88 is expected for 32 cores.
+
+Sorting 10,000,000 elements, assuming F=0.1
+16 cores:
+S ≈ 1 / (0.1 + (0.9 / 16))
+S ≈ 1 / (0.1 + 0.05625) ≈ 6.4
+Thus a speed-up of 6.4 is expected for 16 cores.
+
+32 cores:
+S ≈ 1 / (0.1 + (0.9 / 32))
+S ≈ 1 / (0.1 + 0.028125) ≈ 7.14
+Thus a speed-up of 7.14 is expected for 32 cores.
+
+
+3. Can Amdahls law be used to estimate the
+maximum speed-up for the prime-counting algorithm?
+(CORRECT: NO, only useful when the workload is even. For prime counting the workload changes for larger numbers.)
+Yes.
+The prime-counting algorithm primarily
+consists of independent checks for each number in the specified range.
+Each thread can handle a subset of numbers without needing to
+interact with other threads.
+This setup allows for a nearly "completely" parallel
+workload, meaning that F, the sequential fraction, is close to zero.
+
+So example with F=0.05:
+16 cores:
+S ≈ 1 / (0.05 + (0.95 / 16))
+S ≈ 1 / (0.05 + 0.059375) ≈ 7.27
+Thus a speed-up of 7.27 is expected for 16 cores.
+
+32 cores:
+S ≈ 1 / (0.05 + (0.95 / 32))
+S ≈ 1 / (0.05 + 0.0296875) ≈ 9.09
+Thus a speed-up of 9.09 is expected for 32 cores.
+
+
+------------9.3----------------
+Exercise 9.3 Use the code in file TestCountPrimesThreads.java
+(in the exercises directory for week
+9) to count prime numbers using threads.
+
+1. Report and comment on the results
+you get from running TestCountPrimesThreads.java.
+
+countSequential                 5288370.8 ns  321512.44         64
+countParallelN  1               6881297.7 ns 1419785.49         64
+countParallelNLocal  1          7302423.1 ns  479897.96         32
+countParallelN  2               5312816.3 ns  918878.12         64
+countParallelNLocal  2          5958467.0 ns  935352.27         64
+countParallelN  3               4904739.5 ns  495394.45         64
+countParallelNLocal  3          4975866.9 ns  697312.06         64
+countParallelN  4               3801668.4 ns  278775.35         64
+countParallelNLocal  4          3689046.4 ns  349450.23        128
+countParallelN  5               3350342.7 ns  179688.15        128
+countParallelNLocal  5          3421874.6 ns  223861.80        128
+countParallelN  6               3216997.0 ns  116372.57        128
+countParallelNLocal  6          4884500.6 ns 1776982.51         64
+countParallelN  7               3113187.7 ns  367132.95        128
+countParallelNLocal  7          3906063.3 ns  689401.48        128
+countParallelN  8               4839610.8 ns 1232398.07         64
+countParallelNLocal  8          4339846.6 ns  245350.59         64
+countParallelN  9               3140058.8 ns  203428.57        128
+countParallelNLocal  9          2775549.9 ns   93983.00        128
+countParallelN 10               3690885.5 ns  547671.87        128
+countParallelNLocal 10          6989743.4 ns 3598099.82         32
+countParallelN 11               6590967.3 ns 3385801.09        128
+countParallelNLocal 11          3604169.8 ns  557356.60        128
+countParallelN 12               3713993.9 ns  533344.94         64
+countParallelNLocal 12          3179051.4 ns   93105.63        128
+countParallelN 13               3522913.1 ns  284263.41        128
+countParallelNLocal 13          3565393.6 ns  607131.89         64
+countParallelN 14               3977936.4 ns  810291.55        128
+countParallelNLocal 14          4881001.3 ns 2752810.71         64
+countParallelN 15               4837458.9 ns 1532556.16         64
+countParallelNLocal 15          3627979.9 ns  272860.60        128
+countParallelN 16               4236210.6 ns 1687749.37         64
+countParallelNLocal 16          4219773.7 ns 1498214.49        128
+
+Local seems slower than the other.
+With 1 and 2 cores the parallel versions are slower than the sequential.
+At 3 and more cores they get faster, up until around 7-9 cores (it swings a lot).
+After this, the we don't get any further performance improvements.
+
+2. Rewrite TestCountPrimesThreads.java using Futures for the
+tasks of each of the threads in part 1.
+Run your solutions and report results.
+How do they compare with the results from the version using threads?
+
+See TestCountPrimesThreadsFutures.java for the solution.
+
+countSequential                 4323862.7 ns  135506.79         64
+countParallelWithFutures  1       7595408.1 ns 2880570.18         64
+countParallelWithFutures  2       4516729.8 ns  266783.16         64
+countParallelWithFutures  3       3677999.5 ns  275575.52        128
+countParallelWithFutures  4       3855398.1 ns  322427.68        128
+countParallelWithFutures  5       3653277.8 ns  383878.14         64
+countParallelWithFutures  6       3416103.1 ns  127438.11        128
+countParallelWithFutures  7       3614226.4 ns  362826.43        128
+countParallelWithFutures  8       4024075.0 ns  329753.84         64
+countParallelWithFutures  9       4009278.1 ns  348941.84         64
+countParallelWithFutures 10       3543445.2 ns  477600.27        128
+countParallelWithFutures 11       3518859.7 ns  239819.72        128
+countParallelWithFutures 12       3697757.7 ns  496979.48        128
+countParallelWithFutures 13       3576851.4 ns  236921.75        128
+countParallelWithFutures 14       3635012.5 ns  141814.83        128
+countParallelWithFutures 15       3795347.9 ns  279468.30        128
+countParallelWithFutures 16       5129065.9 ns  602558.08         64
+
+How they compare to results using threads:
+The performance is very similar. With 1-2 cores we don't get a performance boost
+compared to sequential. After around 6 cores it stalls at best performance.
+
+----------------9.4-------------------
+Exercise 9.4 This exercise is a continuation of the
+histogram exercise in week05 (exercise 5.1).
+
+1. Use the benchmarking tools introduced in week08 to compare the
+running times for CasHistogram and
+a monitor implementation (see file HistogramLocks in the
+code-exercises folder for Week 9).
+You may use the skeleton in the file ...exercise9/TestCASLockHistogram
+in the code-exercises folder for Week 9).
+What implementation performs better?
+The monitor implementation or the CAS-based one?
+Is the result you got expected? Explain why.
+
+Parallel Test -   CasHistogram      8653562.8 ns   397140.03         32
+Parallel Test -   HistogramLocks    28964225.6 ns  1676506.50        16
+
+We expect the cas-based one to perform better, as it is lock-free,
+which is also what we observe. The only case where cas might be slower would be
+if we have an extreme amount of contention that causes a lot of re-attempts on the
+cas operation. In this case the cost of context switching (monitor pattern)
+might be lower than the cost of re-attempts (cas pattern).

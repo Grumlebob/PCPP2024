@@ -1,0 +1,4 @@
+
+Run gradle test:
+$ gradle cleanTest test --tests <package>.<test_class>
+$ gradle cleanTest test --tests lecture04.CounterTest

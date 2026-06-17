@@ -1,0 +1,207 @@
+-------for all of the exercises-----------
+For most of the exercises. We have written decisions and comments in the code.
+Therefore we will mostly be writing about the outputs of the tests here.
+
+-----------test 1-------------
+In our first test, we are testing the functionality,
+where both accounts are in the same bank.
+
+For this test we have.
+Account 1 sending account 2 100 DKK.
+Account 2 sending account 1 50 DKK.
+
+We expect a final balance of 950 DKK for account 1 and 1050 DKK for account 2.
+Regardless of message ordering, the bank should handle the messages
+sequentially, and irregardless of the order of the messages, the final balance
+should be the same.
+
+Output of test:
+TEST 1: Valid transactions (same bank)
+Initial balances:
+Account balance: 1000
+Account balance: 1000
+
+Sending payment of 100 from Account1 to Account2...
+Payment of 100 completed successfully
+
+Sending payment of 50 from Account2 to Account1...
+Payment of 50 completed successfully
+
+Final balances:
+Account balance: 950
+Account balance: 1050
+
+-----------test 2-------------
+
+In our second test, we are testing the functionality,
+where both accounts are in different banks for the app only
+Breaking the security requirement of exercise 8:
+"Modify the system above so that Account actors are associated with a bank,
+and ensure that negative deposits
+ are only executed if they are sent by that bank. In other words,
+ only the account’s bank is allowed to
+ withdraw money. Note that positive deposits may be received from any bank."
+
+Using this setup
+    Bank1 = bank:start(),
+    Bank2 = bank:start(),
+    Account1 = account:start(1000, Bank1),
+    Account2 = account:start(1000, Bank1),
+    MobileApp1 = mobile_app:start(Bank1),
+    MobileApp2 = mobile_app:start(Bank2),
+
+As seen, everything uses bank1, except for mobileapp2 which uses bank2.
+That means we should be able to send from account1 to account2.
+But not able to send from account2 to account1.
+
+In the test we therefore have two transactions:
+1. Account1 sending account2 100 DKK. Which should work.
+2. Account2 sending account1 50 DKK. Which should then fail!
+Therefore we expect a finale balance of:
+Account1: 900 DKK
+Account2: 1100 DKK
+
+Output of test:
+TEST 2: Security restriction (different banks)
+Initial balances:
+Account balance: 1000
+Account balance: 1000
+
+Sending payment of 100 from Account1 to Account2 (should work)...
+Payment of 100 completed successfully
+
+Trying payment of 50 from Account2 to Account1 (should fail)...
+(This should fail because MobileApp2 uses Bank2 but Account2 belongs to Bank1)
+Payment of 50 failed
+
+Final balances:
+Account balance: 900
+Account balance: 1100
+
+
+-----------test 3-------------
+
+In our third test, we are testing the functionality,
+where we are sending 100 concurrent payments of
+1 DKK each from Account1 to Account2.
+
+We expect the final balance to be:
+Account1: 900 DKK
+Account2: 1100 DKK
+
+
+TEST 3: Concurrent payments
+Initial balances:
+Account balance: 1000
+Account balance: 1000
+
+Sending 100 concurrent payments of 1 DKK each from Account1 to Account2...
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+Payment of 1 completed successfully
+
+Final balances:
+Account balance: 900
+Account balance: 1100
+
+Expected changes:
+Account1 should decrease by: 100
+Account2 should increase by: 100
+ok

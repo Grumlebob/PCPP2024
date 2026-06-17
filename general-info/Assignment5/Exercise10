@@ -1,0 +1,257 @@
+---------10.1-------------------
+You may find this in Week10/code-exercises ... /PrimeCountingPerf.java.
+In addition to
+counting the number of primes (in the range: 2..range)
+this program also measures the running time of the loop.
+Note, in your solution you may change this declaration (and initialization)
+long count= 0;
+
+---1-5 Results---
+Sequential                      6233393.0 ns  826320.15         64
+IntStream                       5264448.8 ns  445815.43         64
+Parallel                        2126863.0 ns  124632.37        128
+ParallelStream                  3498862.4 ns 1286928.42        128
+ParallelStream (Range)          2370053.6 ns  161334.26        128
+----------------
+
+1. Compile and run PrimeCountingPerf.java. Record the result in a text file.
+
+
+2. Fill in the Java code using a stream for counting the
+number of primes (in the range: 2..range). Record the result in a text file.
+
+
+3. Add code to the stream expression that prints
+all the primes in the range 2..range.
+
+
+4. Fill in the Java code using the intermediate
+operation parallel for counting the number of primes (in the
+range: 2..range). Record the result in a text file.
+
+
+5. Add another prime counting method using a
+parallelStream for counting the number of primes (in
+the range: 2..range). Measure its performance
+using Mark7 in a way similar to how we measured the
+performance of the other three ways of counting primes.
+
+
+----------10.2-------------------
+Exercise 10.2 This exercise is about processing a large
+body of English words, using streams of strings. In particular,
+we use the words in the file app/src/main/resources/english-words.txt,
+in the exercises project directory.
+The exercises below should be solved without any
+explicit loops (or recursion) as far as possible (that is, use
+streams).
+
+!!!!!IMPORTANT!!!!!
+We have hardcoded the filepath for english-words.txt
+To make the code run, please replace the filepath, with
+the hardcoded filepath for your english-words.txt file.
+!!!!!!!!!!!!!!!!!!!
+
+1. Starting from the TestWordStream.java file,
+complete the readWords method and check that you can read
+the file as a stream and count the number of English words in it.
+For the english-words.txt file on
+the course homepage the result should be 235,886.
+
+Words: 235886
+
+2. Write a stream pipeline to print the first 100 words from the file.
+
+
+3. Write a stream pipeline to find and
+print all words that have at least 22 letters.
+
+
+4. Write a stream pipeline to find and print
+some word that has at least 22 letters.
+
+
+5. Write a method boolean isPalindrome(String s) that tests
+whether a word s is a palindrome:
+a word that is the same spelled forward and backward.
+Write a stream pipeline to find all palindromes and
+print them.
+
+
+6. Make a parallel version of the palindrome-printing
+stream pipeline. Is it possible to observe whether it is
+faster or slower than the sequential one?
+
+With prints
+Sequential      127658665    41642316        2
+Parallel        144101690    113277901       2
+
+Without prints
+Sequential       69994067    7429223          4
+Parallel         44328760    5065765          8
+
+With prints it is hard to compare because the printing alone takes up most of the
+time and printing cannot be parallelized. In our test run the parallel happened
+to be slower, but without prints it was faster.
+
+7. Make a new version of the method readWordStream
+which can fetch the list of words from the internet.
+There is a (slightly modified) version of the word list at this URL:
+https://staunstrups.dk/jst/english-words.txt. Use this version of readWordStream
+to count the number of words (similarly to question 7.2.1).
+Note, the number of words is not the same in
+the two files !!
+
+
+
+8. Use a stream pipeline that turns the stream
+of words into a stream of their lengths, to find and print the
+minimal, maximal and average word lengths.
+Hint: There is a simple solution using an
+operator examplified on p. 141 of Java Precisely (included in the
+readings for this week).
+
+
+---------------10.3---------------------
+Exercise 10.3 This exercise is based on the article:
+(Introduction to Java 8 Parallel Stream) (on the readme for
+week10). Start by reading this.
+
+1. Redo the first example (running the code in Java8ParallelStreamMain)
+described in the article. Your solution
+should contain the output from doing this experiment
+and a short explanation of your output.
+
+
+=================================
+Using Sequential Stream
+=================================
+1 main
+2 main
+3 main
+4 main
+5 main
+6 main
+7 main
+8 main
+9 main
+10 main
+=================================
+Using Parallel Stream
+=================================
+7 main
+6 main
+8 ForkJoinPool.commonPool-worker-9
+3 ForkJoinPool.commonPool-worker-3
+1 ForkJoinPool.commonPool-worker-9
+9 ForkJoinPool.commonPool-worker-5
+10 ForkJoinPool.commonPool-worker-9
+5 ForkJoinPool.commonPool-worker-5
+4 ForkJoinPool.commonPool-worker-3
+2 ForkJoinPool.commonPool-worker-7
+
+Explanation: The sequential only runs on main thread.
+The parallel stream has a ForkJoinPool with workers.
+
+
+2. Increase the size of the integer array (from the 10 in the article)
+and see if there is a relation between number
+of cores on your computer and the number of workes in the ForkJoin.
+
+Worker names: 1,3,5,7,9,11,13,15
+So we have 8 cores, and 8 workers are used.
+
+3. Change the example by adding a time consuming task
+(e.g. counting primes in a limited range or the
+example in the artcle). Report what you see when running the example.
+
+A snippet from the output:
+...
+29 is prime - ForkJoinPool.commonPool-worker-3
+31 is prime - ForkJoinPool.commonPool-worker-3
+37 is prime - ForkJoinPool.commonPool-worker-3
+41 is prime - ForkJoinPool.commonPool-worker-3
+2039 is prime - ForkJoinPool.commonPool-worker-11
+3847 is prime - ForkJoinPool.commonPool-worker-15
+3851 is prime - ForkJoinPool.commonPool-worker-15
+3853 is prime - ForkJoinPool.commonPool-worker-15
+3863 is prime - ForkJoinPool.commonPool-worker-15
+2053 is prime - ForkJoinPool.commonPool-worker-11
+2063 is prime - ForkJoinPool.commonPool-worker-11
+2069 is prime - ForkJoinPool.commonPool-worker-11
+2081 is prime - ForkJoinPool.commonPool-worker-11
+2083 is prime - ForkJoinPool.commonPool-worker-11
+2087 is prime - ForkJoinPool.commonPool-worker-11
+...
+
+They sort of "clump together" in the sense that worker 3 gets a lot of
+prints in a row, then 15, then 11, instead of e.g 3, 11, 3, 15, 11, 15.
+This could be because each worker is assigned a range of numbers to check.
+This can also be seen in the output from the print. To avoid the overhead of
+context switching, a worker will calculate a number of primes before the next
+worker starts printing.
+
+---------------10.4---------------------
+Exercise 10.4 Despite many superficial syntactical
+similarities between JavaStream and RxJava, the two concepts
+are fundamentally different. This exercise focus on some of these differences.
+Consider the pseudo-code below (that does not compile and run).
+The source() provides english words and
+the sink() absorbs them. Note that sink() is a
+pseudo-operation that just absorbs the data it receives. Your
+explanations should focus on what happens
+in between the source() and sink().
+
+1. Describe what happens when this code runs:
+source().filter(w -> w.length() > 5).sink()
+• as a JavaStream (e.g. the source is a file)
+• as a RxJava statement where the source could
+  be an input field where a user types strings
+
+--JavaStream:
+source(): returns a lazy stream of words,
+          that is only used when demanded (by a terminal operation)
+filter(w -> w.length() > 5): Intermediate operation that filters out words
+                             with length less than 5
+sink(): terminal operation that consumes the stream. This means, that filter
+        above, doesn't actually start filtering until sink is called
+
+in short:
+The process runs on demand(lazily) once and stops after processing all
+the elements in the source
+
+--RxJava:
+
+source(): Is an observable that emits words continuously in real time, even
+          if there are no subscribers
+
+filter(w -> w.length() > 5): whenever the observable emits a new item that
+                             passes the filter, it is pushed to the next operator
+sink(): Most likely pushes to a subscriber that consumes the data
+
+in short:
+The process runs continuously emitting filtered items to subscribers.
+
+
+2. Describe what happens when this code runs:
+source().filter(w -> w.length() > 5).sink();
+source().filter(w -> w.length() > 10).sink()
+• as a JavaStream (e.g. the source is a file)
+• as a RxJava statement where the source could be
+  an input field where a user types strings
+
+
+--JavaStream:
+Each line is independent of the other.
+The source will be read twice, once for each operation.
+The first statement will happen before the second statement.
+
+--RxJava:
+The source() might be the same for both statements.
+(same Observable object)
+Each pipeline processes emissions independently
+and simultaneously as they occur and is continuous.
+Both pipelines can handle new
+emissions concurrently allowing for real-time processing
+of data streams where different criteria can be met by the
+same or different items emitted.

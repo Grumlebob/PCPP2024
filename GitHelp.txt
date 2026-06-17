@@ -1,0 +1,2 @@
+git pull pcpp main --allow-unrelated-histories        //Nyeste ændringer fra lærens repo: https://github.itu.dk/jst/PCPP2024-public
+git pull/push       //Eget repo på https://github.itu.dk/jacg/PCPP2024

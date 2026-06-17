@@ -1,0 +1,7 @@
+# Taken from https://github.com/javapathfinder/jpf-core/blob/master/src/examples/BoundedBuffer.jpf
+target = BoundedBuffer
+classpath = .
+sourcepath = .
+
+# this should produce a deadlock
+target.args = 2,10,10

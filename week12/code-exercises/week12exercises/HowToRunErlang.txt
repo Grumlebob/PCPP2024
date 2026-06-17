@@ -1,0 +1,11 @@
+# Start Erlang shell
+erl
+
+#to compile alle
+erl -make
+
+# Run the tests
+system_starter:run_all_tests().
+
+# to exit:
+q().

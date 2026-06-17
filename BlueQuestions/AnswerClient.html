@@ -1,0 +1,68 @@
+<!--PCPP  Answerclient: version with multiple Questions 
+JSt August 27, 2024 -->
+
+<html>
+ <meta charset="UTF-8">
+<head>
+  <title>PCPP answer client </title>
+  <script language="javascript">
+
+  const serverURL= "http://130.226.140.136:8080/";
+
+  var questionNo= 0;
+
+  function load (url) {
+    //makes a HTTP request and returns response
+    var x = new XMLHttpRequest();
+    x.open('GET', url, false);
+    x.send();
+    return x.responseText;
+  }
+
+  function insertA(form) {
+    //submit a new answer to the server
+    load(serverURL+"?op=insert&answer="+form.what.value+"&no="+questionNo);
+    form.what.value= "";
+  }
+
+  function findQuestion(received){
+    //returns question field in JSON object returned by load
+    return JSON.parse(received)[0]['question'];
+  }
+
+  function showNext() {
+    //updates the question on the web-page
+    questionNo= questionNo+1;
+    let temp= load(serverURL+"?op=listQ&no="+questionNo);
+    let question= findQuestion(temp);
+    document.getElementById("question").innerHTML=
+      "Question no.: "+questionNo+"\n"+question;
+  }
+
+  </script>
+</head>
+  <table>
+    <tr>
+      <font size= "6"><b>PCPP Answer client</b><font> 
+      <img src="PCPPLogo.png" align= "right"> 
+    </tr>
+  </table>
+	<body> <font size= "4">
+    <b> <p id= "question"> </p> </b>
+    <form name="body"> 
+      <script type="text/javascript"> showNext();  </script>
+    </form>
+    <form name="answer"> 
+      <table>
+        <tr>
+          <td><font size= "4">Answer:</td> <td><input type="text" size="80" name="what"/></font> </td>
+        </tr>
+      </table>
+      <br>
+      <table><tr>
+        <td><input type="button" onclick="insertA(answer);" value="Submit"/></td>
+        <td><input type="button" onclick="showNext();" value="Next Question"/></td>
+      </tr></table>
+    </form>
+  </body>
+</html>

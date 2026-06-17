@@ -1,0 +1,324 @@
+Exercise 6.1 In this exercise, we look into several concurrent
+executions of a FIFO queue. Your task is to
+determine whether they are sequentially consistent or linearizable
+(according to the standard specification of a
+sequential FIFO queue).
+Mandatory
+1. Is this execution sequentially consistent? If so, provide a
+sequential execution that satisfies the standard
+specification of a sequential FIFO queue. Otherwise, explain
+why it is not sequentially consistent.
+A: ---------------|q.enq(x)|--|q.enq(y)|->
+B: ---|q.deq(x)|------------------------->
+
+Yes:
+<q.enq(x), q.enq(y), q.deq(x)>
+FIFO specification holds: x is first to be queued, and first to be dequeued.
+
+
+2. Is this execution (same as above) linearizable? If so,
+provide a linearization that satisfies the standard
+specification of a sequential FIFO queue. Otherwise,
+explain why it is not linearizable.
+A: ---------------|q.enq(x)|--|q.enq(y)|->
+B: ---|q.deq(x)|------------------------->
+
+No. Linearizable is even stricter, and we can't map the linearization points,
+to an execution that follows real-time order and satisfies the FIFO property.
+
+
+
+3. Is this execution linearizable? If so, provide
+a linearization that satisfies the standard specification of a
+sequential FIFO queue. Otherwise, explain why it is not linearizable.
+A: ---| q.enq(x) |-->
+B: ------|q.deq(x)|--------------->
+
+Yes, look at these real time linearizable points:
+A:     ^
+B:        ^
+Resulting in following:
+<q.enq(x), q.deq(x)>
+Specification holds: x is therefore enqueued before it is dequeued.
+
+4. Is this execution linearizable? If so, provide
+a linearization that satisfies the standard specification of a
+sequential FIFO queue. Otherwise, explain why it is not linearizable.
+A: ---|q.enq(x)|-----|q.enq(y)|-->
+B: --| q.deq(y) |->
+
+No:
+y is dequeued before it is enqueued.
+
+5. Is this execution sequentially consistent?
+If so, provide a sequential execution that satisfies the standard
+specification of a sequential FIFO queue.
+Otherwise, explain why it is not sequentially consistent.
+A: -|p.enq(x)|------------|q.enq(x)|------------|p.deq(y)|------------>
+B: ------------|q.enq(y)|------------|p.enq(y)|------------|q.deq(x)|->
+
+A:
+A(1) -> A(2) -> A(3)
+p.enq(x) -> q.enq(x) -> p.deq(y)
+B:
+B(1) -> B(2) -> B(3)
+q.enq(y) -> p.enq(y) -> q.deq(x)
+
+
+B(2) -> A(3)
+p.enq(y) -> p.deq(y)
+B(2) -> A(1)
+p.enq(y) -> p.enq(x)
+
+A(2) -> B(3)
+q.enq(x) -> q.deq(x)
+A(2) -> B(1)
+q.enq(x) -> q.enq(y)
+
+Contradiction:
+
+B(2) -> A(1) -> A(2)
+
+Transitivity
+B(2) -> A(2)
+
+A(2) -> B(1) -> B(2)
+
+Transitivity
+A(2) -> B(2)
+
+Now we have
+A(2) <-> B(2)
+aka
+q.enq(x) <-> p.enq(y)
+
+Which can't work
+
+Exercise 6.2 In this exercise, we look into the Treiber Stack.
+Your task is to reason about its correctness using
+linearization and testing.
+1. Define linearization points for the push and pop methods in the
+Treiber Stack code provided in app/src/
+main/java/exercises06/LockFreeStack.java.
+Explain why those linearization points show
+that the implementation of the Treiber Stack is correct.
+For the explanation, follow a similar approach as we
+did in lecture 6 for the MS Queue (slides 34 and 35).
+
+linearization point for Push:
+H1: (!top.compareAndSet(oldHead,newHead));
+
+because this is when the new node is successfully
+pushed onto the stack and becomes visible to other threads.
+
+linearization points for Pop:
+P1:  oldHead = top.get();
+P2: (!top.compareAndSet(oldHead,newHead));
+
+because that is when the stack has been successfully
+updated and the old head has been removed.
+
+
+Correctness explanation:
+-Example: thread x push onto the stack concurrently with other threads.
+Either x succeeds in pushing with operation H1,
+or it fails because another thread succeeded in doing so and x retries.
+
+-Example: thread x pops from the stack with plenty elements
+concurrently with other threads.
+x gets the head of the stack with operation P1. If the head is not empty
+either x will succeed in popping with operation P2,
+or it fails because another thread succeeded in doing so
+and x retries by getting the new head with P1.
+
+-Example: Same as previous example but the stack may run out of elements:
+When x gets the head with P1 and it receives null,
+it means the stack was empty at the time and x correctly returns null.
+
+
+
+2. Write a JUnit 5 functional correctness test for the push method
+of the Treiber Stack. Consider a stack of
+integers. The test must assert that after n threads push integers
+xn, respectively, the total sum of the elements.
+Write your test in the test skeleton file app/src/test/java/
+exercises06/TestLockFreeStack.java
+
+Done :)
+
+
+3. Write a JUnit 5 functional correctness test for the pop method
+of the Treiber Stack. As before, consider
+a stack of integers. Given a stack with n elements x1, x2, . . . , xn
+already pushed, the test must
+assert the following: after n threads pop one element yi each, the sum
+of popped elements equals the
+sum of elements originally in the stack
+Pni =1 yi. Write your test in the test skeleton file
+app/src/test/java/exercises06/TestLockFreeStack.java
+
+Done :)
+
+4. Do the tests in part 2. and 3. cover all linearization points
+in the Treiber Stack? Explain your answer. If
+you answered that not all linearization points were covered,
+then add additional concurrent functional tests
+to cover all linearization points.
+
+We don't call pop on an empty stack concurrently (only sequentially).
+This means the all outcomes from P1 are not covered in a concurrent execution.
+We can make a test with a stack of x elements, and we do x+(>=1) pops.
+This will cover all outcomes of P1.
+(this has not been implemented tho)
+
+Exercise 6.3 In this exercise, we revisit the progress notions for
+non-blocking computation that we discussed
+in lecture 5.
+1. Consider the reader-writer locks exercise from week 5.
+There are four methods included in this type of
+locks: writerTryLock, writerUnlock, readerTryLock and readerUnlock. State, for each
+method, whether they are wait-free, lock-free or
+obstruction-free and explain your answers.
+
+
+writerTryLock(): Wait-free
+This method uses a single CAS operation.
+It either succeeds or fails in a single attempt.
+This method completes in a bounded number of steps (just one CAS operation)
+regardless of the actions of other threads. It's guaranteed to complete in finite time.
+
+writerUnlock(): Wait-free <- CORRECT
+This method checks the current state and uses a single CAS operation.
+It either succeeds or throws an exception in a single attempt.
+Like writerTryLock(), this method completes in a bounded number of steps
+(one check and one CAS operation) regardless of other threads' actions.
+WRONG ->(Alternative answer: Lock-free, because holders.get might not succeed in a single
+attempt, because it is an atomic reference, which itself under the hood
+utilizes a do-while loop, which might need to retry multiple times)
+
+readerTryLock(): Lock-free
+This method uses a do-while loop with compareAndSet (CAS) operation.
+It can retry multiple times if there's contention.
+It returns false if a writer holds the lock, without retrying.
+The method will eventually complete (either succeed or fail)
+regardless of the actions of other threads. It doesn't use blocking operations,
+but it may need to retry, so it's not wait-free.
+
+readerUnlock(): Lock-free
+This method uses a do-while loop with CAS operation.
+It can retry multiple times if there's contention.
+It throws an exception if the thread doesn't hold a read lock.
+Similar to readerTryLock().
+It may need to retry an unknown amount of times, so it's not wait-free.
+However, if the a given thread fails and tries again it must be because of the
+another thread made progress meaning it is lock-free,
+because that other thread completed in a finite number of steps.
+
+
+
+Exercise 6.4 This exercise is a slightly modified
+version of exercise 3.7 in Herlihy page 71. This exercise
+concerns the following lock-free queue implementation:
+class IQueue<T> {
+AtomicInteger head = new AtomicInteger(0);
+AtomicInteger tail = new AtomicInteger(0);
+T[] items = (T[]) new Object[Integer.MAX_VALUE];
+public void enq(T x) {
+int slot;
+do {
+slot = tail.get();
+} while (!tail.compareAndSet(slot, slot+1)); // E4
+items[slot] = x;
+}
+public T deq() throws EmptyException {
+T value;
+int slot;
+do {
+slot = head.get();
+value = items[slot];
+if (value == null)
+throw new EmptyException();
+} while (!head.compareAndSet(slot, slot+1)); // D8
+return value;
+}
+}
+1. In the code, we have marked two linearization points
+E4 and D8 for enq and deq, respectively. Show that,
+with these linearization points, the implementation is
+not linearizable (according to the standard specification
+of a sequential FIFO queue).
+
+Simple version:
+We enqueue some item x.
+We reach linearization point E4 (and waits)
+If specification holds, then x should be visible to all other threads.
+So another thread dequeues x, but gets EmptyException.
+This shouldn't be possible!
+Therefore the implementation is not linearizable.
+
+Longer version:
+Consider two threads T1 and T2 executing the following operations concurrently:
+T1: enq(A)
+T2: enq(B)
+T1: deq()
+T2: deq()
+Now, let's consider a possible interleaving of these operations:
+
+T1 begins enq(A), reaches E4 (CAS succeeds)
+T2 begins enq(B), reaches E4 (CAS succeeds)
+T1 completes enq(A) by writing A to items[slot]
+T1 begins deq(), reads head (0), reads value A, reaches D8 (CAS succeeds)
+T2 completes enq(B) by writing B to items[slot+1]
+T2 begins deq(), reads head (1), reads value null, throws EmptyException
+
+According to the given linearization points (E4 for enq and D8 for deq),
+the linearization order would be:
+<enq(A), enq(B), deq():A, deq():EmptyException>
+However, this is not a valid sequential history for a queue.
+After two enqueue operations and one successful dequeue,
+the queue should not be empty.
+This shows that the given linearization points do not
+produce a correct linearizable implementation
+
+
+Exercise 6.5 Your task in this exercise is to reason about
+whether the following program is correctly synchronized;
+according to the definition of correctly synchronized
+program in the Java memory model.
+Lock l = new ReentrantLock();
+Thread one = new Thread(() -> {
+l.lock(); // (1)
+a=1; // (2)
+x=b; // (3)
+l.unlock(); // (4)
+}).start();
+Thread two = new Thread(() -> {
+l.lock(); // (5)
+b=1; // (6)
+y=a; // (7)
+l.unlock(); // (8)
+}).start();
+
+1. Prove (formally) whether the program above is or is not
+correctly synchronized. To this end, recall the
+definitions of correctly synchronized program, data race,
+execution, synchronization order, happens-before,
+etc. that we discussed in lecture 6. You may use the numbers
+in the comments at the end of the lines to refer
+to the operations in the program.
+
+let's consider all shared variables (a, b, x, y) and their accesses:
+Variable a: Written in (2), read in (7)
+Variable b: Written in (6), read in (3)
+Variable x: Written in (3)
+Variable y: Written in (7)
+
+For each pair of conflicting accesses:
+
+(2) and (7): These are ordered by the happens-before relationship
+established by the lock operations. Either (1-4) happens-before (5-8), or vice versa.
+(6) and (3): Similarly, these are ordered by the lock operations.
+
+Therefore, all conflicting accesses are ordered by happens-before
+relationships, which means there are no data races in this program.
+Conclusion: The program is correctly synchronized according to the Java Memory Mode

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="code-lecture.app" target="16" />
+      <module name="code-lecture.app.main" target="16" />
+      <module name="code-lecture.app.test" target="16" />
+      <module name="exercises01.app" target="16" />
+      <module name="exercises01.app.main" target="16" />
+      <module name="exercises01.app.test" target="16" />
+      <module name="exercises02.app" target="16" />
+      <module name="exercises02.app.main" target="16" />
+      <module name="exercises02.app.test" target="16" />
+      <module name="exercises03.app" target="16" />
+      <module name="exercises03.app.main" target="16" />
+      <module name="exercises03.app.test" target="16" />
+      <module name="exercises04.app" target="16" />
+      <module name="exercises04.app.main" target="16" />
+      <module name="exercises04.app.test" target="16" />
+      <module name="exercises05.app" target="16" />
+      <module name="exercises05.app.main" target="16" />
+      <module name="exercises05.app.test" target="16" />
+      <module name="exercises06.app" target="16" />
+      <module name="exercises06.app.main" target="16" />
+      <module name="exercises06.app.test" target="16" />
+      <module name="code-lecture.app" target="16" />
+      <module name="code-lecture.app.main" target="16" />
+      <module name="code-lecture.app.test" target="16" />
+      <module name="exercises09.app" target="16" />
+      <module name="exercises09.app.main" target="16" />
+      <module name="exercises09.app.test" target="16" />
+      <module name="week08exercises.exercises03.app" target="16" />
+      <module name="week08exercises.exercises03.app.main" target="16" />
+      <module name="week08exercises.exercises03.app.test" target="16" />
+      <module name="week09exercises.exercises06.app" target="16" />
+      <module name="week09exercises.exercises06.app.main" target="16" />
+      <module name="week09exercises.exercises06.app.test" target="16" />
+      <module name="exercises09.app" target="16" />
+      <module name="exercises09.app.main" target="16" />
+      <module name="exercises09.app.test" target="16" />
+      <module name="exercises10.app" target="16" />
+      <module name="exercises10.app.main" target="16" />
+      <module name="exercises10.app.test" target="16" />
+      <module name="exercises11.app" target="16" />
+      <module name="exercises11.app.main" target="16" />
+      <module name="exercises11.app.test" target="16" />
+      <module name="lecture01.app" target="16" />
+      <module name="lecture01.app.main" target="16" />
+      <module name="lecture01.app.test" target="16" />
+      <module name="lecture07.app" target="16" />
+      <module name="lecture07.app.main" target="16" />
+      <module name="lecture07.app.test" target="16" />
+      <module name="week08exercises.exercises03.app.main~1" target="16" />
+      <module name="week08exercises.exercises03.app.test~1" target="16" />
+      <module name="week08exercises.exercises08.app" target="16" />
+      <module name="week08exercises.exercises08.app.main" target="16" />
+      <module name="week08exercises.exercises08.app.test" target="16" />
+      <module name="week09exercises.exercises06.app" target="16" />
+      <module name="week09exercises.exercises06.app.main" target="16" />
+      <module name="week09exercises.exercises06.app.test" target="16" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -1,0 +1,235 @@
+-------1.1------
+
+----Mandatory----
+1. The main method creates a LongCounter object. Then it creates and starts two threads that run concurrently,
+and each increments the count field 10 million times by calling method increment.
+What output values do you get? Do you get the expected output, i.e., 20 million?
+
+Count is 19793512.
+Since there is no coordination, we did not expect to get 20 million,
+only in some very very rare interleaving.
+
+
+2. Reduce the counts value from 10 million to 100, recompile, and rerun the code. It is now likely that you
+get the expected result (200) in every run.
+Explain how this could be. Is it guaranteed that the output is always 200?
+
+Fewer interleavings, so it is more likely to get the expected result.
+Also overhead for starting a thread, means it is more likely to do a few
+runs of one thread before starting concurrently the other.
+
+
+3. The increment method in LongCounter uses the assignment
+count = count + 1;
+to add one to count. This could be expressed also as count += 1 or as count++.
+Do you think it would make any difference to use one of these forms instead? Why? Change the code and
+run it. Do you see any difference in the results for any of these alternatives?
+
+No difference. Because isn't directly executed, it is first compiled
+to Java Virtual Machine Code
+
+
+4. Set the value of counts back to 10 million. Use Java ReentrantLock to ensure that the output of the
+program equals 20 million. Explain why your solution is correct, and why no other output is possible.
+Note: In your explanation, please use the concepts and vocabulary introduced during the lecture, e.g., critical
+sections, interleavings, race conditions, mutual exclusion, etc.
+Note II: The notes above applies to all exercises asking you to explain the correctness of your solution.
+
+Critical zone: Read counter, increment temporary variable, write back to counter.
+The ReentrantLock is a mutex and is used to ensure that only one thread can execute
+the critical section at a time.
+This ensures no race conditions on the counter variable,
+during the read-modify-write operation, which counter++ is
+
+
+5. By using the ReetrantLock in the exercise above, you have defined a critical section. Does your critical
+section contain the least number of lines of code? If so, explain why. If not, fix it and explain why your new
+critical section contains the least number of lines of code.
+Hint: Recall that the critical section should only include the parts of the program that only one thread can
+execute at the same time.
+
+Because the first operation of count++ is a read of variable count,
+we must ensure that the whole operation is atomic, including the read and the write.
+Thus our critical section contains the least number of lines of code.
+
+For less lines of code, we can also utilize java "Synchronized block"
+public synchronized void increment() {
+        count++;
+}
+
+
+---Challenging---
+
+
+6. Decompile the methods increment from above to see the byte code in the three versions (as is, +=, ++).
+The basic decompiler is javap. The decompiler takes as input a (target) .class file. In Gradle projects,
+.class files are located in the directory app/build/classes/—after compiling the .java files.
+The flag -c decompiles the code of a class. Does the output of javap verify or refuse the explanation you
+provided in part 3.?
+
+It sure does! The bytecode is the same for all three versions of incrementing the counter.
+
+
+7. Extend the LongCounter class with a decrement() method which subtracts 1 from the count field
+without using locks. Change the code in main so that t1 calls decrement 10 million times, and t2 calls
+increment 10 million times, on a LongCounter instance. What should the expected output be after
+both threads have completed?
+Use ReentrantLock to ensure that the program outputs 0. Explain why your solution is correct, and
+why no other output is possible.
+
+Without lock: Count is -16369
+With lock: 0
+
+Why it works:
+the line count-- in decrement, is made to be atomic, by using the ReentrantLock.
+It works exactly the same as increment
+
+
+8. Explain, in terms of the happens-before relation, why your solution for part 4 produces the expected output.
+
+Thread: A, B
+Events: A_0: Read count, A_1: Increment, A_2: Write count
+
+I_A(A_0,A_1,A_2) -> I_B(B_0,B_1,B_2) -> repeats... (follows program-order-rule)
+Thus we have a partial order of the intervals
+In terms of rules for happens-before. We never have a sequence of Lock() Lock(). Only lock() unlock() lock() unlock()
+Therefore we follow the Monitor-lock rule
+
+9. Again for the code in part 4 (i.e., without decrement()), remove the ReetrantLock you added. Set
+the variable counts to 3.
+What is the minimum value that the program prints? Does the minimum value change if we set counts to
+a larger number (e.g., 20 million)?
+Provide an interleaving showing how the minimum value output can occur.
+
+Minimum value: 2, both threads only read the value (wrong time), and then increment it.
+
+Interleaving showing x:
+A: Read 0
+
+B: Read 0
+B: Increment 1
+B: Write 1
+B: Read 1
+B: Increment 2
+B: Write 2
+A: Increment 1
+A: Write 1
+B: Read 1
+A: continues till done
+B: Increment 2
+B: Write 2
+
+If count is 20 million, then minimum is still 2, but the interleaving is more complex.
+
+-------1.2------
+Exercise 1.2 Consider this class, whose print method prints a dash “-”, waits for 50 milliseconds, and then
+prints a vertical bar “|”:
+
+Mandatory
+1. Write a program that creates a Printer object p, and then creates and starts two threads. Each thread must
+call p.print() forever. Note: You can easily run your program using the gradle project for the exercises
+by placing your code in the directory week01exercises/app/src/main/java/exercises01/
+(remember to add package exercises01; as the first line of your Java files).
+You will observe that, most of the time, your program print the dash and bar symbols alternate neatly as in
+-|-|-|-|-|-|-|. But occasionally two bars are printed in a row, or two dashes are printed in a row,
+creating small “weaving faults” like those shown below:
+-|-|-|-||--|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-||--|
+-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+-|-|-|-|-|-|-|-|-||--|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+
+
+2. Describe and provide an interleaving where this happens.
+
+Syntax for interleavings: <thread>(<step>)
+
+System.out.print("-");                                          //(0)
+try { Thread.sleep(50); } catch (InterruptedException exn) { }  //(1)
+System.out.print("|");                                          //(2)
+
+t1(0)   //-
+t2(0)   //--
+t1(1)   //--
+t2(1)   //-- q
+t1(2)   //--|
+t2(2)   //--||
+
+3. Use Java ReentrantLock to ensure that the program outputs the expected sequence -|-|-|-|....
+Compile and run the improved program to see whether it works. Explain why your solution is correct, and
+why it is not possible for incorrect patterns, such as in the output above, to appear.
+
+synchronized is a ReentrantLock lock.
+
+Each thread will write a dash, then wait, then write a bar, before releasing the lock.
+(see detailed explanation below)
+
+--Challenging--
+4. Explain, in terms of the happens-before relation, why your solution for part 3 produces the correct output.
+
+Thread: A, B
+Events: A_0: print -, A_1: wait, A_2: print |
+
+I_A(A_0,A_1,A_2) -> I_B(B_0,B_1,B_2) -> repeats... (follows program-order-rule)
+
+
+-------1.3------
+Exercise 1.3 Imagine that due to the COVID-19 pandemic Tivoli decides to limit the number of visitors
+to 15000. To this end, you are asked to modify the code for the turnstiles we saw in the lecture. The file
+CounterThreads2Covid.java includes a new constant MAX_PEOPLE_COVID equal to 15000. However,
+the two threads simulate 20000 people entering to the park, so unfortunately some people will not get in :’(.
+Mandatory
+1. Modify the behaviour of the Turnstile thread class so that that exactly 15000 enter the park; no less
+no more. To this end, simply add a check before incrementing counter to make sure that there are
+less than 15000 people in the park. Note that the class does not use any type of locks. You must use
+ReentrantLock to ensure that the program outputs the correct value, 15000.
+2. Explain why your solution is correct, and why it always output 15000.
+
+
+Locking the critical zone before performing the check in the if statement makes sure that the other thread
+cannot sneak more people in the meantime
+
+
+-------1.4------
+Exercise 1.4 In Goetz chapter 1.1, three motivations for concurrency is given: resource utilization, fairness and
+convenience. In the note about concurrency there is an alternative characterization of the different motivations for
+concurrency (coined by the Norwegian computer scientist Kristen Nygaard):
+• Inherent User interfaces and other kinds of input/output.
+• Exploitation Hardware capable of simultaneously executing multiple streams of statements. A special (but
+important) case is communication and coordination of independent computers on the internet,
+• Hidden Enabling several programs to share some resources in a manner where each can act as if they had
+sole ownership.
+Mandatory
+Neither of the definitions is very precise, so for this exercise, there are many possible and acceptable answers.
+1. Compare the categories in the concurrency note (https://github.itu.dk/jst/PCPP2024-Public/blob/main/week01/
+concurrency-note/concurrencyPCPP.pdf and Goetz, try to find some examples of systems which are included
+in the categories of Goetz, but not in those in the concurrency note, and vice versa (if possible - if
+not possible, argue why).
+
+Examples Not in Goetz but in the Concurrency Note:
+* Doesn't mention code architectures and models, where Goetz talks about Convenience Simplifying complex asynchronous programming models
+
+Examples in Goetz but Not in the Concurrency Note:
+* Fairness. The the notes there is no talk about how long the threads have access/who gets access first.
+* Doesn't mention hardware.
+
+
+2. Find examples of 3 systems in each of the categories in the Concurrency note which you have used yourself
+(as a programmer or user).
+
+Inherent: Gui, Webserver
+Exploitation: Multi-core processor
+Hidden: Docker / Virtual machine
+
+Resource utilization: Garbage collector, CPU scheduling
+Fairness: Operating systems.
+Convenience: C# async/await
+
+
+
+
+

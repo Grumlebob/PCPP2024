@@ -1,0 +1,197 @@
+Exercise 2.1 Consider the Readers and Writers problem we saw in class. As a reminder, here is the specification
+of the problem:
+• Several reader and writer threads want to access a shared resource.
+• Many readers may access the resource at the same time as long as there are no writers.
+• At most one writer may access the resource if and only if there are no readers.
+
+--Mandatory--
+1. Use Java Intrinsic Locks (i.e., synchronized) to implement a monitor ensuring that the access to the
+shared resource by reader and writer threads is according to the specification above. You may use the code
+in the lectures and Chapter 8 of Herlihy as inspiration, but do not feel obliged copy that structure.
+
+Done. See ReaderWriterImplIntrinsicLock.java
+
+2. Is your solution fair towards writer threads? In other words, does your solution ensure that if a writer
+thread wants to write, then it will eventually do so? If so, explain why. If not, modify part 1. so that
+your implementation satisfies this fairness requirement, and then explain why your new solution satisfies
+the requirement.
+
+The method WriteLock, ensures that it sets the variable:
+isWriterInQueue = true;
+
+Where as in ReadLock, it won't acquire the lock if isWriterInQueue is true.
+while (isWriterInQueue) {
+    wait();
+}
+
+This ensures that once a writer wants to write, no more readers can read,
+and the writer will eventually write.
+
+The previous implementation, only set isWriterInQueue = true
+When there were 0 readers, thus if endless readers were to come,
+the writer would starve the
+
+
+
+--Challenging--
+3. Is it possible to ensure absence of starvation using
+ReentrantLock or intrinsic java locks (synchronized)? Explain why.
+
+(Not fair/absence of starvation, because writers are not FIFO,
+so one writer might wait forever. So answer below is wrong)
+
+Yes, it is possible, see solution in part 2.
+Why: Conditions can be used, to ensure certain properties.
+In above, we use a condition if isWriterInQueue is true, then wait.
+and for a writer, we also use a condition,
+if another writer is in queue, then wait aswell.
+This ensures the happens-before properties, that when a writer wants to write,
+it will eventually write.
+
+
+
+Exercise 2.2 Consider the lecture’s example in file TestMutableInteger.java, which contains this definition
+of class MutableInteger:
+
+---Mandatory---
+1. Execute the example as is. Do you observe the "main" thread’s write to mi.value remains invisible to
+the t thread, so that it loops forever? Independently of your observation, is it possible that the program
+loops forever? Explain your answer.
+
+The value might be stored in the cache,
+thus if updated won't be visible to other
+threads as they read from memory.
+Thus main thread updating value to 42, is not seen by t,
+because it has stored the value as 0 in the cache, and
+repeatedly reads this 0 infinitely
+
+
+2. Use Java Intrinsic Locks (synchronized) on the methods of the MutableInteger to ensure that
+thread t always terminates. Explain why your solution prevents thread t from running forever.
+
+Synchronized, also ensures visibility of the variables,
+so other threads will
+read from the memory, and not from the cache.
+Thus when the method exits a synchronized block,
+and another thread enters the synchronized block,
+it will read fresh values.
+
+3. Would thread t always terminate if get()
+is not defined as synchronized? Explain your answer.
+
+This wouldn't work.
+If get is not synchronized, then the value might be cached.
+Thus upon repeat calls to get(), the cached value will be returned.
+
+
+4. Remove all the locks in the program, and define value
+in MutableInteger as a volatile variable.
+Does thread t always terminate in this case? Explain your answer.
+
+In this case it will terminate.
+Volatile basically means, that we shouldn't use cache.
+Therefore when reading the value, it will read from memory.
+In our case the only race condition which might happen, because we aren't using locks.
+Is that either the main thread or the t thread, might read the value, before it is updated.
+But since we are in a loop, it doesn't matter if first reads 0 or 42, because the value
+will eventually always be updated to 42, and thus thread t will escape the while loop.
+
+
+
+---Challenging---
+5. Use happens-before reasoning to show that the program in part 1. does not terminate. To this end, you
+must first state the operations that should be related with happens-before interleavings of the program to
+terminate. Then, you should list all the happens-before pairs between that the program induces, and argue
+that none pairs of operations required for the program to terminate are related by happens-before.
+
+Operations:
+Get
+Set
+
+We cannot say that Get -> Set. But we also cannot say Set -> Get.
+Therefore we cannot ensure that the value is updated in the memory,
+ and not in the cache.
+
+In order for the program to terminate we need the following operation pair happens-before relation:
+ Set 42 -> Get 42
+But since we don't have that, it won't necessarily terminate.
+
+
+
+6. Explain part 3. in terms of the happens-before relation. If you skipped exercise 5., start by stating the (pairs
+of) operations that must related by happens-before so that the program terminates. Similar to exercise 5.,
+list all pairs of operations related by happens-before given by the program. Now there will be new pairs
+introduced by the locks. Finally, show that the required operations required to be related by happens-before
+are effectively related.
+
+get()  // 0 is retrieved and saved to cache
+LOCK()
+set(42) // 42 is stored in memory
+UNLOCK()
+Get()   // 0 is loaded from cache
+
+𝑎 is an unlock() and 𝑏 is a lock() on the same lock
+But only a is doing unlock, and b is neither locking or unlocking.
+Thus we don't have a happens-before relationship between a and b.
+
+
+7. Explain part 4. in terms of the happens-before relation. Similar to parts 5. and 6., you must explicitly state
+the operations that must be related via happens-before for the program to terminate, and list all pairs related
+by happens-before according to the program. In this exercise, there will be new pairs introduced by volatile.
+Finally, show that the operations required to be related by happens-before are effectively related.
+
+get()   //0. Always from main memory
+set(42) //42. Always to main memory
+Get()   //42. Always from main memory
+
+Can also happen with volatile and multiple threads
+get() //0
+set(42) //42
+get()   //while above thread was setting 42, we were concurrently reading a 0, while the above thread is modifying.
+Because there is no locking, we have no mutual exclusion
+Every thread can read and write the variable at same time, thus there is
+no happens-before relationship between the threads.
+
+
+Exercise 2.3 Consider the small artificial program in file TestLocking0.java. In class Mystery, the
+single mutable field sum is private, and all methods are synchronized, so superficially the class seems that
+no concurrent sequence of method calls can lead to race conditions.
+---Mandatory---
+1. Execute the program several times. Show the results you get. Are there any race conditions?
+
+Yes!
+Sum is 1105101.000000 and should be 2000000.000000
+Thus a race condition is present.
+
+2. Explain why race conditions appear when t1 and t2 use the Mystery object. Hint: Consider (a) what it
+means for an instance method to be synchronized, and (b) what it means for a static method to be synchronized.
+
+They use two different locks.
+
+1. Intrinsic lock on the instance: public synchronized void addInstance(double x)
+    //this is equivalent to locking Mystery m = new Mystery();
+2. Intrinsic lock on the class: public static synchronized void addStatic(double x)
+    //This is equivalent to locking Mystery.class
+When the first lock is acquired, the second lock can still be acquired by another thread.
+Thus the sum can be updated by two threads at the same time.
+
+
+3. Implement a new version of the class Mystery so that the execution of t1 and t2 does not produce race
+conditions, without changing the modifiers of the field and methods in the Mystery class. That is, you
+should not make any static field into an instance field (or vice versa), and you should not make any static
+method into an instance method (or vice versa).
+Explain why your new implementation does not have race conditions.
+
+We introduced a single global lock:
+private static final Lock lock = new ReentrantLock();
+By sharing the same lock, we ensure a happens-before relationship
+
+4. Note that the method sum() also uses an intrinsic lock. Is the use of this intrinsic lock on sum()
+necessary for this program? In other words, would there be race conditions if you remove the modifier
+synchronized from sum() (assuming that you have fixed the race conditions in 3.)?
+
+It still works if sum is not synchronized since calling .join() on the two threads ensures
+a happens-before relationship that is sum() is called only after t1 and t2 has finished.
+
+
+

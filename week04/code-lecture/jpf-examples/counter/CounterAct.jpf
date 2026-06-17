@@ -1,0 +1,11 @@
+target = CounterAct
+classpath = .
+sourcepath = .
+
+report.console.property_violation=trace
+report.console.show_steps=true
+report.console.show_source=true
+report.console.show_method=true
+report.console.show_location=true
+report.console.show_code=true
+report.console.show_cg=false

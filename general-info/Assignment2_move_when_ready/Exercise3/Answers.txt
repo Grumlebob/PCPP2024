@@ -1,0 +1,100 @@
+-----3.1----
+
+1. Implement a class BoundedBuffer<T> as described above using
+only Java Semaphore for synchronization—
+i.e., Java Lock or intrinsic locks (synchronized) cannot be used.
+
+See CustomBlockingQueue.java
+
+
+2. Explain why your implementation of BoundedBuffer<T> is thread-safe.
+Hint: Recall our definition of
+thread-safe class, and the elements to identify/consider in analyzing
+thread-safe classes (see slides).
+
+Thread-safe class definition:
+State: Consists of our buffer array, and two integers that keep track of the indexes for the array. Semaphores are also part of the state.
+Escaping: Our state variables are private, and no reference is exposed through a method
+Publication: Our buffer/semaphores are Final, and references are never changed.
+Immutability: The content of our buffer is mutable, so we need mutual exclusion when altering it.
+Mutual exclusion: We use a combination of a shared lock when modifying the buffer, and two semaphores, that each count availeble insert/take slots.
+When a counter is 0, the thread will block, until the other thread has released a slot.
+
+The shared semaphore has one permit to allow one inserter or taker to enter the critical section.
+The take semaphore has 0 permits since we cannot let a taker enter before an inserter has inserted an element.
+The inserter is limited by the capacity to ensure that we can only insert while there is room available.
+
+
+3. Is it possible to implement BoundedBuffer<T> using Barriers? Explain your answer.
+
+It wouldn't be benificial, as there is no point where all threads must wait for each other.
+But it would be possible, with some hacky code, like just setting barrier capacity to 1, and use it like an ordinary lock.
+But it would be a waste of resources, and not a good solution.
+
+
+4. One of the two constructors to Semaphore has an extra parameter named fair.
+Explain what it does, and
+explain if it matters in this example. If it does not matter in this example,
+find an example where it does matter.
+
+fair is a boolean that determines if the semaphore should be fair or not.
+Fair: threads will be awoken in the order they requested the permit (FIFO).
+Unfair: threads will be awoken in an arbitrary order.
+
+Without fair, we can have a starvation problem, where example thread 2 is never awoken,
+because thread 1 keeps taking the permit.
+(Bare in mind, we can have starvation problems with fair set as true)
+
+In a situation where it is important that all threads get a chance to
+insert/take, the fair parameter would be important.
+
+---3.2 Person----
+
+1. Implement a thread-safe version of Person using Java intrinsic locks (synchronized).
+Hint: The Person class may include more attributes than those stated above;
+including static attributes.
+
+2. Explain why your implementation of the Person constructor is thread-safe,
+and why subsequent accesses
+to a created object will never refer to partially created objects.
+
+State: idCounter is part of the state and is shared across all Person objects.
+       The remaining fields are instance variables and are unique to each object.
+Escaping: All of the fields are private and no references to the objects are passed
+Publication: In the constructors we use intrinsic locks on the person class to ensure safe publication.
+Immutability: The state variables can be changed using the methods making the class mutable.
+Mutual exclusion: To ensure mutual exclusion we use intrinsic locks.
+When checking the idCounter before setting initial id and incrementing idCounter,
+we use the intrinsic class lock since idCounter is static.
+On the remaining getters and setters with use the intrinsic object lock.
+
+3. Implement a main thread that starting several threads the create and
+use instances of the Person class.
+
+We have two threads, t1 and t2, where t1 sets initial id to 1005 and t2
+randomly initializes with either 0 or 2005.
+Whichever thread initializes first determines the
+following sequence of id's.
+They should increment meaning we either get ids 0-19, 1005-1024
+or 2005-2024 with all 20 ids being unique.
+
+4. Assuming that you did not find any errors when running 3.
+Is your experiment in 3 sufficient to prove that
+your implementation is thread-safe?
+
+It is impossible to prove that a program is thread-safe just by running tests
+since a non-thread safe program is non-deterministic and may give the correct result
+in all test case runs, but might eventually fail to a race condition.
+
+---3.3 Semaphore/Barrier---
+
+1. Implement a Semaphore thread-safe class using Java Lock.
+Use the description of semaphore provided in the slides.
+
+See CustomSemaphore.java
+
+2. Implement a (non-cyclic) Barrier thread-safe class
+using your implementation of Semaphore above.
+Use the description of Barrier provided in the slides.
+
+See CustomBarrier.java
